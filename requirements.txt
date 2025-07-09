@@ -75,4 +75,11 @@ tensorboard>=2.8.0
 # Additional utilities
 requests>=2.27.0
 beautifulsoup4>=4.10.0
-lxml>=4.7.0 
+lxml>=4.7.0
+
+# Data Acquisition Phase 1 Dependencies
+typer>=0.7.0
+pandera>=0.13.0
+pandasdmx>=1.9.0
+pyarrow>=10.0.0
+rich>=12.0.0 

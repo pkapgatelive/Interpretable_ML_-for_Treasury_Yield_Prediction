@@ -35,6 +35,8 @@ from src.utils.constants import (
     SUPPORTED_DATA_FORMATS,
     RANDOM_SEEDS,
     EVALUATION_METRICS,
+    LOG_FORMAT,
+    LOG_DATE_FORMAT,
 )
 
 # Setup module logger
@@ -469,6 +471,279 @@ def format_percentage(value: float, decimals: int = 2) -> str:
         Formatted percentage string
     """
     return f"{value * 100:.{decimals}f}%"
+
+
+def setup_logging(
+    log_level: str = "INFO",
+    log_file: Optional[str] = None,
+    log_dir: str = "logs"
+) -> logging.Logger:
+    """
+    Setup logging configuration for the application.
+    
+    Parameters
+    ----------
+    log_level : str
+        Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    log_file : Optional[str]
+        Log file name. If None, logs only to console.
+    log_dir : str
+        Directory to store log files
+        
+    Returns
+    -------
+    logging.Logger
+        Configured logger instance
+    """
+    # Create logs directory if it doesn't exist
+    if log_file:
+        create_directory(log_dir)
+        log_path = Path(log_dir) / log_file
+    else:
+        log_path = None
+    
+    # Configure logging
+    logging.basicConfig(
+        level=getattr(logging, log_level.upper()),
+        format=LOG_FORMAT,
+        datefmt=LOG_DATE_FORMAT,
+        filename=log_path,
+        filemode='a' if log_path else None
+    )
+    
+    # Also log to console if logging to file
+    if log_path:
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(getattr(logging, log_level.upper()))
+        formatter = logging.Formatter(LOG_FORMAT, LOG_DATE_FORMAT)
+        console_handler.setFormatter(formatter)
+        
+        logger = logging.getLogger()
+        logger.addHandler(console_handler)
+    
+    return logging.getLogger(__name__)
+
+
+def create_directory(path: Union[str, Path]) -> Path:
+    """
+    Create directory if it doesn't exist.
+    
+    Parameters
+    ----------
+    path : Union[str, Path]
+        Path to directory to create
+        
+    Returns
+    -------
+    Path
+        Path object of created directory
+    """
+    path_obj = Path(path)
+    path_obj.mkdir(parents=True, exist_ok=True)
+    return path_obj
+
+
+def validate_date_format(date_string: str) -> bool:
+    """
+    Validate if date string is in YYYY-MM-DD format.
+    
+    Parameters
+    ----------
+    date_string : str
+        Date string to validate
+        
+    Returns
+    -------
+    bool
+        True if valid date format, False otherwise
+    """
+    try:
+        datetime.strptime(date_string, '%Y-%m-%d')
+        return True
+    except ValueError:
+        return False
+
+
+def clean_numeric_data(
+    df: pd.DataFrame,
+    columns: Optional[List[str]] = None,
+    fill_method: str = "forward"
+) -> pd.DataFrame:
+    """
+    Clean numeric data by handling missing values and outliers.
+    
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame to clean
+    columns : Optional[List[str]]
+        Specific columns to clean. If None, cleans all numeric columns.
+    fill_method : str
+        Method to fill missing values ('forward', 'backward', 'interpolate', 'drop')
+        
+    Returns
+    -------
+    pd.DataFrame
+        Cleaned DataFrame
+    """
+    df_clean = df.copy()
+    
+    if columns is None:
+        columns = df_clean.select_dtypes(include=[np.number]).columns.tolist()
+    
+    for col in columns:
+        if col not in df_clean.columns:
+            continue
+            
+        # Handle missing values
+        if fill_method == "forward":
+            df_clean[col] = df_clean[col].fillna(method='ffill')
+        elif fill_method == "backward":
+            df_clean[col] = df_clean[col].fillna(method='bfill')
+        elif fill_method == "interpolate":
+            df_clean[col] = df_clean[col].interpolate()
+        elif fill_method == "drop":
+            df_clean = df_clean.dropna(subset=[col])
+    
+    return df_clean
+
+
+def calculate_data_quality_metrics(df: pd.DataFrame) -> Dict[str, Any]:
+    """
+    Calculate data quality metrics for a DataFrame.
+    
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame to analyze
+        
+    Returns
+    -------
+    Dict[str, Any]
+        Dictionary containing data quality metrics
+    """
+    metrics = {}
+    
+    # Basic metrics
+    metrics["total_rows"] = len(df)
+    metrics["total_columns"] = len(df.columns)
+    
+    # Missing data analysis
+    missing_counts = df.isnull().sum()
+    missing_percentages = (missing_counts / len(df) * 100).round(2)
+    
+    metrics["missing_data"] = {
+        "total_missing": missing_counts.sum(),
+        "missing_by_column": missing_counts.to_dict(),
+        "missing_percentage_by_column": missing_percentages.to_dict(),
+        "columns_with_missing": missing_counts[missing_counts > 0].index.tolist()
+    }
+    
+    # Data type analysis
+    metrics["data_types"] = df.dtypes.astype(str).to_dict()
+    
+    # Numeric columns analysis
+    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    if numeric_cols:
+        metrics["numeric_summary"] = {
+            "columns": numeric_cols,
+            "statistics": df[numeric_cols].describe().to_dict()
+        }
+    
+    # Date columns analysis
+    date_cols = df.select_dtypes(include=['datetime64']).columns.tolist()
+    if date_cols:
+        metrics["date_summary"] = {
+            "columns": date_cols,
+            "date_ranges": {
+                col: {
+                    "min": df[col].min().strftime('%Y-%m-%d') if pd.notna(df[col].min()) else None,
+                    "max": df[col].max().strftime('%Y-%m-%d') if pd.notna(df[col].max()) else None
+                }
+                for col in date_cols
+            }
+        }
+    
+    return metrics
+
+
+def save_data_with_metadata(
+    df: pd.DataFrame,
+    filepath: Union[str, Path],
+    metadata: Optional[Dict[str, Any]] = None,
+    format: str = "csv"
+) -> None:
+    """
+    Save DataFrame with associated metadata.
+    
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame to save
+    filepath : Union[str, Path]
+        Path to save the file
+    metadata : Optional[Dict[str, Any]]
+        Additional metadata to save
+    format : str
+        File format ('csv' or 'parquet')
+    """
+    filepath = Path(filepath)
+    
+    # Save the main data file
+    if format.lower() == "parquet":
+        df.to_parquet(filepath, index=False)
+    else:
+        df.to_csv(filepath, index=False)
+    
+    # Save metadata if provided
+    if metadata:
+        metadata_path = filepath.with_suffix('.metadata.json')
+        import json
+        with open(metadata_path, 'w') as f:
+            json.dump(metadata, f, indent=2, default=str)
+
+
+def format_file_size(size_bytes: int) -> str:
+    """
+    Format file size in human readable format.
+    
+    Parameters
+    ----------
+    size_bytes : int
+        File size in bytes
+        
+    Returns
+    -------
+    str
+        Formatted file size string
+    """
+    if size_bytes == 0:
+        return "0 B"
+    
+    size_names = ["B", "KB", "MB", "GB", "TB"]
+    i = 0
+    while size_bytes >= 1024 and i < len(size_names) - 1:
+        size_bytes /= 1024.0
+        i += 1
+    
+    return f"{size_bytes:.1f} {size_names[i]}"
+
+
+def generate_timestamp(format: str = "%Y%m%d_%H%M%S") -> str:
+    """
+    Generate timestamp string.
+    
+    Parameters
+    ----------
+    format : str
+        Timestamp format string
+        
+    Returns
+    -------
+    str
+        Formatted timestamp string
+    """
+    return datetime.now().strftime(format)
 
 
 # Example usage

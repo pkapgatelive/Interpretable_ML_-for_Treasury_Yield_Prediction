@@ -21,25 +21,86 @@ YIELD_TENORS = [0.25, 0.5, 1, 2, 3, 5, 7, 10, 20, 30]
 YIELD_TENOR_NAMES = ["3M", "6M", "1Y", "2Y", "3Y", "5Y", "7Y", "10Y", "20Y", "30Y"]
 YIELD_TENOR_MAPPING = dict(zip(YIELD_TENORS, YIELD_TENOR_NAMES))
 
-# FRED (Federal Reserve Economic Data) Series IDs
+# Model and training constants
+MODEL_RANDOM_STATE = 42
+TEST_SIZE = 0.2
+VALIDATION_SIZE = 0.2
+
+# Data processing constants
+MISSING_VALUE_THRESHOLD = 0.1  # 10% missing values threshold
+MIN_OBSERVATIONS = 100  # Minimum observations required
+
+# FRED API Series IDs for data acquisition
 FRED_SERIES_IDS = {
-    "DGS3MO": "3-Month Treasury",
-    "DGS6MO": "6-Month Treasury", 
-    "DGS1": "1-Year Treasury",
-    "DGS2": "2-Year Treasury",
-    "DGS3": "3-Year Treasury",
-    "DGS5": "5-Year Treasury",
-    "DGS7": "7-Year Treasury",
-    "DGS10": "10-Year Treasury",
-    "DGS20": "20-Year Treasury",
-    "DGS30": "30-Year Treasury",
+    # Treasury Yields
+    "DGS1MO": "1-Month Treasury Constant Maturity Rate",
+    "DGS3MO": "3-Month Treasury Constant Maturity Rate", 
+    "DGS6MO": "6-Month Treasury Constant Maturity Rate",
+    "DGS1": "1-Year Treasury Constant Maturity Rate",
+    "DGS2": "2-Year Treasury Constant Maturity Rate",
+    "DGS3": "3-Year Treasury Constant Maturity Rate",
+    "DGS5": "5-Year Treasury Constant Maturity Rate",
+    "DGS7": "7-Year Treasury Constant Maturity Rate",
+    "DGS10": "10-Year Treasury Constant Maturity Rate",
+    "DGS20": "20-Year Treasury Constant Maturity Rate",
+    "DGS30": "30-Year Treasury Constant Maturity Rate",
+    
+    # Monetary Policy
     "FEDFUNDS": "Federal Funds Rate",
-    "CPIAUCSL": "CPI All Items",
+    "DFF": "Daily Federal Funds Rate",
+    "TB3MS": "3-Month Treasury Bill Rate",
+    
+    # Inflation
+    "CPIAUCSL": "Consumer Price Index for All Urban Consumers: All Items",
+    "CPILFESL": "Consumer Price Index for All Urban Consumers: All Items Less Food and Energy",
+    "PCEPILFE": "Personal Consumption Expenditures Excluding Food and Energy (Chain-Type Price Index)",
+    "T5YIE": "5-Year Breakeven Inflation Rate",
+    "T10YIE": "10-Year Breakeven Inflation Rate",
+    
+    # Economic Activity
+    "INDPRO": "Industrial Production Index",
+    "PAYEMS": "All Employees, Nonfarm Payrolls",
     "UNRATE": "Unemployment Rate",
-    "GDPC1": "Real GDP",
-    "VIXCLS": "VIX Volatility Index",
-    "DEXUSEU": "USD/EUR Exchange Rate",
+    "NAPM": "ISM Manufacturing: PMI Composite Index",
+    "UMCSENT": "University of Michigan: Consumer Sentiment",
+    
+    # Financial Markets
+    "DEXUSEU": "U.S. / Euro Foreign Exchange Rate",
+    "DEXJPUS": "Japanese Yen to U.S. Dollar Spot Exchange Rate",
+    "VIXCLS": "CBOE Volatility Index: VIX",
+    "SP500": "S&P 500",
+    
+    # Credit
+    "BAMLC0A0CM": "ICE BofA US Corporate Index Option-Adjusted Spread",
+    "TEDRATE": "TED Spread",
+    
+    # Housing
+    "HOUST": "New Privately-Owned Housing Units Started: Total Units",
+    "CSUSHPISA": "S&P/Case-Shiller U.S. National Home Price Index"
 }
+
+# Data validation bounds
+YIELD_BOUNDS = {
+    "min": -5.0,  # Minimum reasonable yield (negative rates possible)
+    "max": 50.0   # Maximum reasonable yield
+}
+
+MACRO_BOUNDS = {
+    "rates": {"min": -5.0, "max": 50.0},
+    "indices": {"min": 0.0, "max": 1000.0},
+    "employment": {"min": 0.0, "max": 50.0}  # unemployment rate %
+}
+
+# File naming conventions
+DATA_FILENAME_PATTERNS = {
+    "treasury": "yieldcurve_us_{date}.{ext}",
+    "macro": "macro_fred_{date}.{ext}",
+    "ecb": "yieldcurve_ecb_{date}.{ext}"
+}
+
+# Logging configuration
+LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 # Macro Economic Indicators
 MACRO_INDICATORS = [
