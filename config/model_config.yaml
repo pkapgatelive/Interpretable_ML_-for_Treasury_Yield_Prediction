@@ -1,0 +1,306 @@
+# Model Configuration for Yield Curve Forecasting
+# ================================================
+
+# Baseline Models
+baseline_models:
+  # Linear Regression
+  linear_regression:
+    fit_intercept: true
+    normalize: false
+    copy_X: true
+    n_jobs: -1
+    
+  # ARIMA
+  arima:
+    order: [2, 1, 2]  # (p, d, q)
+    seasonal_order: [1, 1, 1, 12]  # (P, D, Q, s)
+    trend: 'c'  # constant
+    
+  # Vector Autoregression (VAR)
+  var:
+    maxlags: 5
+    ic: 'aic'  # Information criterion
+    trend: 'c'
+    
+  # Nelson-Siegel Model
+  nelson_siegel:
+    tau: 2.0  # Shape parameter
+    optimize_tau: true
+
+# Tree-Based Models
+tree_models:
+  # Random Forest
+  random_forest:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 5
+    min_samples_leaf: 2
+    max_features: 'sqrt'
+    bootstrap: true
+    oob_score: true
+    random_state: 42
+    n_jobs: -1
+    
+  # Gradient Boosting
+  gradient_boosting:
+    n_estimators: 100
+    learning_rate: 0.1
+    max_depth: 6
+    min_samples_split: 5
+    min_samples_leaf: 2
+    subsample: 0.8
+    random_state: 42
+    
+  # XGBoost
+  xgboost:
+    n_estimators: 100
+    learning_rate: 0.1
+    max_depth: 6
+    min_child_weight: 1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    gamma: 0
+    reg_alpha: 0
+    reg_lambda: 1
+    random_state: 42
+    n_jobs: -1
+    
+  # LightGBM
+  lightgbm:
+    n_estimators: 100
+    learning_rate: 0.1
+    max_depth: 6
+    min_child_samples: 20
+    subsample: 0.8
+    colsample_bytree: 0.8
+    reg_alpha: 0
+    reg_lambda: 0
+    random_state: 42
+    n_jobs: -1
+
+# Neural Networks
+neural_networks:
+  # Multi-layer Perceptron
+  mlp:
+    hidden_layer_sizes: [100, 50]
+    activation: 'relu'
+    solver: 'adam'
+    alpha: 0.0001
+    batch_size: 'auto'
+    learning_rate: 'constant'
+    learning_rate_init: 0.001
+    max_iter: 1000
+    random_state: 42
+    early_stopping: true
+    validation_fraction: 0.1
+    n_iter_no_change: 10
+    
+  # LSTM
+  lstm:
+    units: [64, 32]
+    dropout: 0.2
+    recurrent_dropout: 0.2
+    return_sequences: true
+    activation: 'tanh'
+    recurrent_activation: 'sigmoid'
+    use_bias: true
+    kernel_initializer: 'glorot_uniform'
+    recurrent_initializer: 'orthogonal'
+    bias_initializer: 'zeros'
+    
+  # GRU
+  gru:
+    units: [64, 32]
+    dropout: 0.2
+    recurrent_dropout: 0.2
+    return_sequences: true
+    activation: 'tanh'
+    recurrent_activation: 'sigmoid'
+    use_bias: true
+    kernel_initializer: 'glorot_uniform'
+    recurrent_initializer: 'orthogonal'
+    bias_initializer: 'zeros'
+    
+  # Transformer
+  transformer:
+    d_model: 64
+    n_heads: 8
+    n_layers: 4
+    d_ff: 256
+    dropout: 0.1
+    activation: 'relu'
+    max_seq_length: 252  # 1 year of daily data
+
+# Training Configuration
+training:
+  # General training parameters
+  batch_size: 32
+  epochs: 100
+  validation_split: 0.2
+  
+  # Early stopping
+  early_stopping:
+    monitor: 'val_loss'
+    patience: 10
+    restore_best_weights: true
+    
+  # Learning rate scheduling
+  lr_scheduler:
+    type: 'reduce_on_plateau'
+    factor: 0.5
+    patience: 5
+    min_lr: 1e-7
+    
+  # Optimizer settings
+  optimizer:
+    type: 'adam'
+    learning_rate: 0.001
+    beta_1: 0.9
+    beta_2: 0.999
+    epsilon: 1e-7
+    
+  # Loss functions
+  loss_functions:
+    regression: 'mse'
+    classification: 'categorical_crossentropy'
+    
+  # Metrics
+  metrics:
+    - 'mae'
+    - 'mse'
+    - 'rmse'
+    - 'mape'
+
+# Ensemble Methods
+ensemble:
+  # Voting Regressor
+  voting:
+    voting: 'soft'
+    n_jobs: -1
+    
+  # Stacking
+  stacking:
+    cv: 5
+    passthrough: false
+    n_jobs: -1
+    
+  # Bagging
+  bagging:
+    n_estimators: 10
+    max_samples: 1.0
+    max_features: 1.0
+    bootstrap: true
+    bootstrap_features: false
+    oob_score: false
+    warm_start: false
+    n_jobs: -1
+    random_state: 42
+
+# Hyperparameter Tuning
+hyperparameter_tuning:
+  # Grid Search
+  grid_search:
+    cv: 5
+    scoring: 'neg_mean_squared_error'
+    n_jobs: -1
+    verbose: 1
+    
+  # Random Search
+  random_search:
+    n_iter: 50
+    cv: 5
+    scoring: 'neg_mean_squared_error'
+    n_jobs: -1
+    random_state: 42
+    verbose: 1
+    
+  # Bayesian Optimization
+  bayesian_optimization:
+    n_calls: 50
+    acq_func: 'EI'  # Expected Improvement
+    random_state: 42
+    n_random_starts: 10
+
+# Model Evaluation
+evaluation:
+  # Metrics
+  metrics:
+    - 'mae'
+    - 'mse'
+    - 'rmse'
+    - 'mape'
+    - 'r2'
+    - 'explained_variance'
+    
+  # Cross-validation
+  cross_validation:
+    cv_folds: 5
+    scoring: ['neg_mean_squared_error', 'neg_mean_absolute_error', 'r2']
+    
+  # Backtesting
+  backtesting:
+    window_size: 252  # 1 year
+    step_size: 21     # 1 month
+    min_train_size: 1260  # 5 years
+    
+# Feature Selection
+feature_selection:
+  # Univariate selection
+  univariate:
+    score_func: 'f_regression'
+    k: 20
+    
+  # Recursive feature elimination
+  rfe:
+    n_features_to_select: 20
+    step: 1
+    
+  # SelectFromModel
+  select_from_model:
+    threshold: 'median'
+    
+  # Variance threshold
+  variance_threshold:
+    threshold: 0.01
+
+# Regularization
+regularization:
+  # Ridge
+  ridge:
+    alpha: 1.0
+    fit_intercept: true
+    normalize: false
+    copy_X: true
+    max_iter: 1000
+    tol: 0.001
+    solver: 'auto'
+    random_state: 42
+    
+  # Lasso
+  lasso:
+    alpha: 1.0
+    fit_intercept: true
+    normalize: false
+    precompute: false
+    copy_X: true
+    max_iter: 1000
+    tol: 0.0001
+    warm_start: false
+    positive: false
+    random_state: 42
+    selection: 'cyclic'
+    
+  # Elastic Net
+  elastic_net:
+    alpha: 1.0
+    l1_ratio: 0.5
+    fit_intercept: true
+    normalize: false
+    precompute: false
+    max_iter: 1000
+    copy_X: true
+    tol: 0.0001
+    warm_start: false
+    positive: false
+    random_state: 42
+    selection: 'cyclic' 

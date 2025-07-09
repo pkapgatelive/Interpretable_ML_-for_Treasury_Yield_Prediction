@@ -1,0 +1,170 @@
+# Main Configuration File for Yield Curve Forecasting Project
+# =============================================================
+
+# Project Information
+project:
+  name: "yield-curve-forecasting"
+  version: "0.1.0"
+  description: "Interpretable ML Models for Yield Curve Forecasting and Monetary Policy Analysis"
+  author: "Your Name"
+  institution: "Your Institution"
+
+# Data Configuration
+data:
+  # Data paths (relative to project root)
+  raw_data_path: "data/raw"
+  processed_data_path: "data/processed"
+  features_path: "data/features"
+  external_data_path: "data/external"
+  
+  # Data sources and API keys (store sensitive keys in .env file)
+  sources:
+    fred:
+      api_key: "${FRED_API_KEY}"  # Set in environment
+      base_url: "https://api.stlouisfed.org/fred"
+    
+    bloomberg:
+      api_key: "${BLOOMBERG_API_KEY}"
+      
+    treasury:
+      base_url: "https://home.treasury.gov/resource-center/data-chart-center"
+  
+  # Yield curve tenors to include (in years)
+  tenors: [0.25, 0.5, 1, 2, 3, 5, 7, 10, 20, 30]
+  
+  # Date range for analysis
+  date_range:
+    start_date: "2000-01-01"
+    end_date: "2023-12-31"
+    validation_split: 0.2
+    test_split: 0.2
+  
+  # Data frequency
+  frequency: "daily"  # daily, weekly, monthly
+
+# Feature Engineering
+features:
+  # Yield curve features
+  yield_features:
+    - "level"      # Average yield across curve
+    - "slope"      # 10Y - 2Y spread
+    - "curvature"  # 2*(5Y) - (2Y) - (10Y)
+    - "twist"      # Long-end slope minus short-end slope
+  
+  # Technical indicators
+  technical_indicators:
+    - "moving_average_5"
+    - "moving_average_20"
+    - "moving_average_60"
+    - "rsi_14"
+    - "bollinger_bands"
+  
+  # Macro economic features
+  macro_features:
+    - "fed_funds_rate"
+    - "cpi_inflation"
+    - "unemployment_rate"
+    - "gdp_growth"
+    - "vix"
+    - "dollar_index"
+  
+  # Lags to include
+  lags: [1, 2, 3, 5, 10, 20]
+
+# Modeling
+modeling:
+  # Target variable configuration
+  target:
+    variable: "yield_curve"
+    forecast_horizon: [1, 5, 10, 20]  # days ahead
+    
+  # Train/validation/test split
+  split:
+    train_ratio: 0.6
+    validation_ratio: 0.2
+    test_ratio: 0.2
+    time_series_split: true
+  
+  # Cross-validation
+  cross_validation:
+    method: "time_series_split"
+    n_splits: 5
+    test_size_days: 252  # 1 year
+
+# Experiment Tracking
+experiment:
+  # MLflow configuration
+  mlflow:
+    experiment_name: "yield_curve_forecasting"
+    tracking_uri: "mlruns"
+    
+  # Weights & Biases configuration
+  wandb:
+    project: "yield-curve-forecasting"
+    entity: "your-wandb-entity"
+    
+  # Random seed for reproducibility
+  random_seed: 42
+  
+  # Logging level
+  log_level: "INFO"
+
+# Visualization
+visualization:
+  # Plot settings
+  figsize: [12, 8]
+  dpi: 300
+  style: "seaborn-v0_8"
+  
+  # Color palette
+  colors:
+    primary: "#1f77b4"
+    secondary: "#ff7f0e"
+    success: "#2ca02c"
+    danger: "#d62728"
+    
+  # Export settings
+  export:
+    format: ["png", "pdf", "svg"]
+    bbox_inches: "tight"
+    
+# Interpretability
+interpretability:
+  # SHAP configuration
+  shap:
+    sample_size: 1000
+    max_display: 20
+    
+  # LIME configuration
+  lime:
+    num_features: 10
+    num_samples: 1000
+    
+  # Feature importance
+  feature_importance:
+    top_k: 20
+    
+# Deployment
+deployment:
+  # Model serving
+  serving:
+    port: 8000
+    host: "0.0.0.0"
+    
+  # API configuration
+  api:
+    version: "v1"
+    title: "Yield Curve Forecasting API"
+    description: "API for yield curve forecasting models"
+    
+# Computational Resources
+compute:
+  # Parallel processing
+  n_jobs: -1  # Use all available cores
+  
+  # Memory limits
+  memory_limit: "8GB"
+  
+  # GPU settings
+  use_gpu: false
+  gpu_memory_growth: true 

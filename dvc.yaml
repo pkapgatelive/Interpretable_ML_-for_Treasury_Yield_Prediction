@@ -1,0 +1,102 @@
+stages:
+  # Data ingestion stage
+  data_ingestion:
+    cmd: python scripts/data_ingestion.py
+    deps:
+    - config/config.yaml
+    - src/data/data_loader.py
+    outs:
+    - data/raw/yield_curve_data.csv
+    - data/raw/macro_data.csv
+    
+  # Data preprocessing stage
+  data_preprocessing:
+    cmd: python scripts/data_preprocessing.py
+    deps:
+    - data/raw/yield_curve_data.csv
+    - data/raw/macro_data.csv
+    - config/config.yaml
+    - src/data/data_cleaner.py
+    outs:
+    - data/processed/clean_yield_data.csv
+    - data/processed/clean_macro_data.csv
+    
+  # Feature engineering stage
+  feature_engineering:
+    cmd: python scripts/feature_engineering.py
+    deps:
+    - data/processed/clean_yield_data.csv
+    - data/processed/clean_macro_data.csv
+    - config/config.yaml
+    - src/data/feature_engineering.py
+    outs:
+    - data/features/engineered_features.csv
+    - data/features/feature_metadata.json
+    
+  # Model training stage
+  model_training:
+    cmd: python scripts/train_model.py
+    deps:
+    - data/features/engineered_features.csv
+    - config/config.yaml
+    - config/model_config.yaml
+    - src/models/
+    params:
+    - config.modeling.split
+    - model_config.tree_models.random_forest
+    - model_config.neural_networks.lstm
+    outs:
+    - models/trained/random_forest_model.pkl
+    - models/trained/lstm_model.h5
+    - models/artifacts/training_metrics.json
+    
+  # Model evaluation stage
+  model_evaluation:
+    cmd: python scripts/evaluate_model.py
+    deps:
+    - models/trained/
+    - data/features/engineered_features.csv
+    - config/config.yaml
+    - src/models/evaluation.py
+    outs:
+    - reports/model_performance.json
+    - reports/figures/model_comparison.png
+    metrics:
+    - reports/metrics.json
+    
+  # Generate forecasts stage
+  generate_forecasts:
+    cmd: python scripts/generate_forecasts.py
+    deps:
+    - models/trained/
+    - data/features/engineered_features.csv
+    - config/config.yaml
+    outs:
+    - reports/forecasts/yield_curve_forecasts.csv
+    - reports/figures/forecast_plots.png
+
+# Plots configuration
+plots:
+  - reports/figures/model_comparison.png:
+      title: "Model Performance Comparison"
+      x: model_name
+      y: rmse
+      
+  - reports/figures/forecast_plots.png:
+      title: "Yield Curve Forecasts"
+      x: date
+      y: yield
+
+# Metrics configuration
+metrics:
+  - reports/metrics.json
+
+# Parameters tracking
+params:
+  - config/config.yaml:
+      - modeling.split
+      - features.lags
+      - experiment.random_seed
+  - config/model_config.yaml:
+      - tree_models.random_forest
+      - neural_networks.lstm 
