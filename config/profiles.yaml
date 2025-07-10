@@ -18,7 +18,7 @@ team_profiles:
     contact: "kapilamallah@hrc.du.ac.in"
     links:
       hansraj_profile: "https://www.hansrajcollege.ac.in/academics/departments/arts-and-commerce/economics/faculty-detail/64/"
-    tagline: "AI Engineered by Dr. Kapila Mallah"
+    tagline: "Finance & Economics by Dr. Kapila Mallah"
     image: "static/images/team/dr_kapila_mallah.jpg"
     order: 1
 
@@ -35,7 +35,7 @@ team_profiles:
     contributions: "Project lead, full-stack architecture, integration of ML pipeline with frontend"
     links:
       linkedin: "https://www.linkedin.com/in/pkapgate"
-    tagline: "Built by Mr. Pappu Kapgate"
+    tagline: "Built by Mr. Pappu Kapgate, AI Engineer"
     image: "static/images/team/mr_pappu_kapgate.jpg"
     order: 2
 

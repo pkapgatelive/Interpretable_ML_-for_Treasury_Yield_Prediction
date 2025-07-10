@@ -1,0 +1,320 @@
+# Financial & ML Glossary for YieldCurveAI
+# ==========================================
+# Educational resource for stakeholders, policymakers, and users
+# to understand key concepts in yield curve forecasting and machine learning
+
+glossary_config:
+  title: "📘 Financial Glossary"
+  description: "Essential financial and machine learning terminology for understanding U.S. Treasury yield curve forecasting"
+  last_updated: "2025-01-11"
+  total_terms: 38
+
+categories:
+  yield_curve_concepts:
+    name: "Yield Curve & Treasury Concepts"
+    icon: "📈"
+    
+  macroeconomic_indicators:
+    name: "Macroeconomic Indicators"
+    icon: "💰"
+    
+  machine_learning:
+    name: "Machine Learning & AI"
+    icon: "🤖"
+    
+  forecasting_methods:
+    name: "Forecasting & Time Series"
+    icon: "🔮"
+    
+  evaluation_metrics:
+    name: "Model Evaluation & Statistics"
+    icon: "📊"
+
+terms:
+  yield_curve:
+    term: "Yield Curve"
+    category: "yield_curve_concepts"
+    definition: "A graph showing the relationship between interest rates and different maturity periods for U.S. Treasury securities, from 3 months to 30 years."
+    context: "This is the main target of our forecasting application. Users can generate predictions for the entire yield curve shape."
+    example: "A normal yield curve slopes upward, meaning longer-term bonds have higher yields than shorter-term ones."
+    visual: "yield_curve_example.png"
+    
+  tenor:
+    term: "Tenor"
+    category: "yield_curve_concepts"
+    definition: "The length of time until a bond or financial instrument matures and must be repaid."
+    context: "In YieldCurveAI, users can see forecasts for different tenors: 3M, 6M, 1Y, 2Y, 3Y, 5Y, 7Y, 10Y, 20Y, 30Y."
+    example: "A 10Y tenor means the Treasury bond matures in 10 years."
+    visual: "tenor_timeline.png"
+    
+  slope:
+    term: "Yield Curve Slope"
+    category: "yield_curve_concepts"
+    definition: "The difference between long-term and short-term interest rates, indicating the overall direction of the yield curve."
+    context: "YieldCurveAI analyzes slope changes to predict economic conditions and monetary policy impacts."
+    example: "A steep slope (3% difference between 30Y and 3M) suggests strong economic growth expectations."
+    
+  curvature:
+    term: "Yield Curve Curvature"
+    category: "yield_curve_concepts"
+    definition: "The degree of bend or curve in the yield curve, measuring how much the curve deviates from a straight line."
+    context: "Our ML models capture curvature patterns to predict complex yield curve shapes beyond simple upward or downward slopes."
+    example: "High curvature might show rates rising sharply for medium-term bonds but leveling off for long-term bonds."
+    
+  maturity_date:
+    term: "Maturity Date"
+    category: "yield_curve_concepts"
+    definition: "The specific calendar date when a bond expires and the principal amount is repaid to the investor."
+    context: "YieldCurveAI calculates maturity dates for each tenor when generating forecasts, showing exactly when bonds will mature."
+    example: "A 5-year Treasury bought today will have a maturity date exactly 5 years from the purchase date."
+    
+  treasury_securities:
+    term: "Treasury Securities"
+    category: "yield_curve_concepts"
+    definition: "Debt instruments issued by the U.S. government, considered the safest investments with virtually no default risk."
+    context: "YieldCurveAI specifically forecasts yields for U.S. Treasury securities across all major tenors."
+    example: "Treasury bills (T-bills), notes (T-notes), and bonds (T-bonds) represent different maturity ranges."
+    
+  fed_funds_rate:
+    term: "Federal Funds Rate"
+    category: "macroeconomic_indicators"
+    definition: "The interest rate at which banks lend money to each other overnight, set by the Federal Reserve as a key monetary policy tool."
+    context: "Users input the Fed Funds Rate as a primary economic variable that influences all Treasury yields in our forecasting model."
+    example: "When the Fed raises rates from 5.0% to 5.25%, it typically pushes up yields across the entire curve."
+    visual: "fed_funds_chart.png"
+    
+  cpi_yoy:
+    term: "CPI Year-over-Year (%)"
+    category: "macroeconomic_indicators"
+    definition: "Consumer Price Index change from the same month in the previous year, measuring inflation in everyday goods and services."
+    context: "CPI YoY is a key input variable in YieldCurveAI, as inflation expectations directly impact Treasury yields."
+    example: "CPI YoY of 3.2% means prices have risen 3.2% compared to last year."
+    
+  unemployment_rate:
+    term: "Unemployment Rate"
+    category: "macroeconomic_indicators"
+    definition: "The percentage of the labor force that is actively seeking employment but currently without jobs."
+    context: "Used as an economic indicator in our models to gauge overall economic health and its impact on interest rates."
+    example: "Unemployment dropping from 4.5% to 3.8% might signal economic strength and potential rate increases."
+    
+  vix:
+    term: "VIX (Volatility Index)"
+    category: "macroeconomic_indicators"
+    definition: "A measure of market fear and uncertainty, often called the 'fear gauge,' based on stock market option prices."
+    context: "VIX levels help our models understand market stress, which affects demand for safe Treasury securities."
+    example: "VIX above 30 indicates high market anxiety, typically driving investors toward Treasury bonds."
+    
+  forecast_horizon:
+    term: "Forecast Horizon"
+    category: "forecasting_methods"
+    definition: "The length of time into the future for which a prediction is made."
+    context: "YieldCurveAI offers multiple forecast horizons: 1-day, 1-week, and 1-month, allowing users to choose prediction timeframes."
+    example: "A 1-week forecast horizon predicts where yields will be 7 days from today."
+    
+  expanding_window:
+    term: "Expanding Window"
+    category: "forecasting_methods"
+    definition: "A backtesting technique where the training data grows larger with each prediction, using all available historical data up to that point."
+    context: "Our models use expanding window validation to test performance using realistic, time-aware data splits."
+    example: "For a 2020 prediction, the model trains on all data from 2000-2019, then 2000-2020 for 2021, etc."
+    
+  ridge_regression:
+    term: "Ridge Regression"
+    category: "machine_learning"
+    definition: "A linear regression technique that adds a penalty term to prevent overfitting, especially useful when dealing with many variables."
+    context: "One of the core ML models available in YieldCurveAI, particularly effective for yield curve forecasting due to its stability."
+    example: "Ridge regression finds the best balance between fitting the data and keeping the model simple."
+    
+  lasso:
+    term: "LASSO Regression"
+    category: "machine_learning"
+    definition: "Least Absolute Shrinkage and Selection Operator - a regression method that automatically selects the most important variables."
+    context: "Available as a model option in YieldCurveAI, LASSO helps identify which economic factors most strongly influence yields."
+    example: "LASSO might determine that Fed Funds Rate and CPI are more important than unemployment for yield prediction."
+    
+  elastic_net:
+    term: "Elastic Net"
+    category: "machine_learning"
+    definition: "A machine learning method that combines Ridge and LASSO regression, balancing variable selection with stability."
+    context: "The default 'best performing' model in YieldCurveAI, providing robust yield curve forecasts across different market conditions."
+    example: "Elastic Net captures the benefits of both Ridge (stability) and LASSO (feature selection) approaches."
+    
+  random_forest:
+    term: "Random Forest"
+    category: "machine_learning"
+    definition: "An ensemble method that combines many decision trees to make more accurate and stable predictions."
+    context: "One of the advanced ML models in YieldCurveAI, particularly good at capturing non-linear relationships in yield data."
+    example: "Random Forest might discover complex patterns like 'yields behave differently when CPI is above 4% AND unemployment below 4%'."
+    
+  gradient_boosting:
+    term: "Gradient Boosting"
+    category: "machine_learning"
+    definition: "An advanced ensemble technique that builds models sequentially, with each new model correcting errors from previous ones."
+    context: "Available in YieldCurveAI for capturing sophisticated patterns in yield curve movements and economic relationships."
+    example: "Gradient boosting might learn that certain combinations of economic indicators predict yield changes better than individual factors."
+    
+  svr:
+    term: "Support Vector Regression (SVR)"
+    category: "machine_learning"
+    definition: "A machine learning approach that finds the best fitting line through data while being robust to outliers."
+    context: "One of the model options in YieldCurveAI, particularly useful during volatile market periods with unusual yield movements."
+    example: "SVR can maintain accurate predictions even during market crises when yields behave unusually."
+    
+  pca:
+    term: "Principal Component Analysis (PCA)"
+    category: "machine_learning"
+    definition: "A technique that reduces complex datasets to their most important patterns, making analysis simpler and more focused."
+    context: "Used in YieldCurveAI to identify the key factors driving yield curve movements, like level, slope, and curvature."
+    example: "PCA might reveal that 95% of yield curve changes can be explained by just 3 main factors."
+    
+  feature_matrix:
+    term: "Feature Matrix (X)"
+    category: "machine_learning"
+    definition: "The input data containing all the economic variables and indicators used to make predictions."
+    context: "In YieldCurveAI, the feature matrix includes Fed Funds Rate, CPI, unemployment, VIX, and other economic indicators."
+    example: "Each row represents a date, each column represents an economic variable like 'Fed_Funds_Rate' or 'CPI_YoY'."
+    
+  target_matrix:
+    term: "Target Matrix (Y)"
+    category: "machine_learning"
+    definition: "The output data containing the yield values that the model is trying to predict."
+    context: "Contains the actual Treasury yields for all tenors that YieldCurveAI attempts to forecast."
+    example: "Each row shows the yield values for 3M, 6M, 1Y, 2Y, 3Y, 5Y, 7Y, 10Y, 20Y, 30Y on a specific date."
+    
+  interpretable_ml:
+    term: "Interpretable Machine Learning"
+    category: "machine_learning"
+    definition: "AI approaches designed to be understandable and explainable to humans, showing how decisions are made."
+    context: "YieldCurveAI emphasizes interpretable models so users can understand why certain yield predictions are made."
+    example: "The model can explain: 'Yields increased because the Fed Funds Rate rose and inflation expectations climbed'."
+    
+  time_series_split:
+    term: "Time Series Split"
+    category: "forecasting_methods"
+    definition: "A method of testing models that respects time order, ensuring future data never leaks into past predictions."
+    context: "YieldCurveAI uses time series splits to validate model performance in a realistic, time-aware manner."
+    example: "Train on 2020-2022 data, test on 2023 data, then train on 2020-2023 data, test on 2024 data."
+    
+  arima:
+    term: "ARIMA Model"
+    category: "forecasting_methods"
+    definition: "AutoRegressive Integrated Moving Average - a classical statistical method for forecasting time series data."
+    context: "Available as a baseline forecasting method in YieldCurveAI for comparison with modern ML approaches."
+    example: "ARIMA uses patterns in past yield movements to predict future yields, like 'yields tend to revert to their average'."
+    
+  var_model:
+    term: "Vector Autoregression (VAR)"
+    category: "forecasting_methods"
+    definition: "A statistical model that captures relationships between multiple time series variables simultaneously."
+    context: "Used in YieldCurveAI to model how different Treasury tenors influence each other over time."
+    example: "VAR might show that 10-year yield changes predict 30-year yield changes with a 2-day lag."
+    
+  rmse:
+    term: "Root Mean Square Error (RMSE)"
+    category: "evaluation_metrics"
+    definition: "A measure of how far off predictions are from actual values, with larger errors weighted more heavily."
+    context: "The primary metric used in YieldCurveAI to select the best performing model - lower RMSE means better accuracy."
+    example: "RMSE of 0.023 means the model's predictions are typically within 0.023 percentage points of actual yields."
+    
+  mae:
+    term: "Mean Absolute Error (MAE)"
+    category: "evaluation_metrics"
+    definition: "The average absolute difference between predicted and actual values, treating all errors equally."
+    context: "Displayed in YieldCurveAI's model performance table to show typical prediction accuracy in simple terms."
+    example: "MAE of 0.019 means the average prediction error is 0.019 percentage points."
+    
+  r_squared:
+    term: "R² Score (R-squared)"
+    category: "evaluation_metrics"
+    definition: "A statistic measuring how well the model explains the variation in the data, from 0% (no explanation) to 100% (perfect)."
+    context: "Shown in YieldCurveAI to indicate how much of yield movements the model successfully captures."
+    example: "R² of 0.892 means the model explains 89.2% of yield curve variations."
+    
+  mape:
+    term: "Mean Absolute Percentage Error (MAPE)"
+    category: "evaluation_metrics"
+    definition: "The average percentage error between predictions and actual values, making it easy to understand accuracy."
+    context: "Displayed in YieldCurveAI to show model accuracy as a percentage that stakeholders can easily interpret."
+    example: "MAPE of 2.34% means predictions are typically within 2.34% of the actual yield values."
+    
+  diebold_mariano:
+    term: "Diebold-Mariano Test"
+    category: "evaluation_metrics"
+    definition: "A statistical test that determines whether one forecasting model is significantly more accurate than another."
+    context: "Used in YieldCurveAI's backend to scientifically validate which models perform statistically better."
+    example: "The test might show that Elastic Net is significantly more accurate than Ridge regression with 95% confidence."
+    
+  model_auto_select:
+    term: "Model Auto-Selection"
+    category: "machine_learning"
+    definition: "An automated process that chooses the best performing model based on statistical criteria like lowest error rates."
+    context: "YieldCurveAI automatically selects the model with the lowest RMSE for generating forecasts."
+    example: "If Elastic Net has RMSE of 0.023 and Ridge has 0.028, the system automatically uses Elastic Net."
+    
+  prediction_engine:
+    term: "Prediction Engine"
+    category: "machine_learning"
+    definition: "The core computational system that takes economic inputs and generates yield curve forecasts using trained models."
+    context: "The backend system in YieldCurveAI that processes user inputs and produces the yield curve charts and predictions."
+    example: "When you input Fed Funds Rate 5.25% and CPI 3.2%, the prediction engine calculates yields for all tenors."
+    
+  confidence_interval:
+    term: "Confidence Interval"
+    category: "evaluation_metrics"
+    definition: "A range around a prediction that indicates the uncertainty or reliability of the forecast."
+    context: "Advanced YieldCurveAI versions show confidence bands around yield predictions to indicate forecast reliability."
+    example: "A 95% confidence interval of 4.8%-5.2% means we're 95% confident the actual yield will fall in this range."
+    
+  yield_spread:
+    term: "Yield Spread"
+    category: "yield_curve_concepts"
+    definition: "The difference in yield between two different securities or tenors, often used to gauge market conditions."
+    context: "YieldCurveAI calculates and uses yield spreads like the 10Y-2Y spread as input features for modeling."
+    example: "A 10Y-2Y spread of 1.2% means 10-year bonds yield 1.2 percentage points more than 2-year bonds."
+    
+  yield_level:
+    term: "Yield Level"
+    category: "yield_curve_concepts"
+    definition: "The overall height of the yield curve, representing the general level of interest rates across all maturities."
+    context: "Used as a feature in YieldCurveAI models to capture the overall interest rate environment."
+    example: "When the yield level is high (6%+), all Treasury securities offer relatively attractive returns."
+    
+  monetary_policy:
+    term: "Monetary Policy"
+    category: "macroeconomic_indicators"
+    definition: "Actions taken by the Federal Reserve to influence economic conditions through interest rates and money supply."
+    context: "YieldCurveAI incorporates monetary policy signals through Fed Funds Rate and other indicators to improve forecasts."
+    example: "Hawkish monetary policy (raising rates) typically pushes up yields across the curve."
+    
+  basis_point:
+    term: "Basis Point (bp)"
+    category: "yield_curve_concepts"
+    definition: "One hundredth of a percentage point (0.01%), commonly used to describe small changes in interest rates."
+    context: "YieldCurveAI predictions are often accurate to within a few basis points of actual yields."
+    example: "A yield increase from 4.25% to 4.50% represents a 25 basis point rise."
+    
+  backtest:
+    term: "Backtesting"
+    category: "evaluation_metrics"
+    definition: "Testing a model's performance using historical data to simulate how it would have performed in the past."
+    context: "YieldCurveAI validates all models through extensive backtesting to ensure reliable real-world performance."
+    example: "Backtesting from 2020-2023 shows the model would have achieved 0.023 RMSE on historical data."
+
+search_tags:
+  - yield
+  - curve
+  - treasury
+  - prediction
+  - forecast
+  - interest
+  - rate
+  - federal
+  - reserve
+  - inflation
+  - model
+  - machine
+  - learning
+  - accuracy
+  - error
+  - economic
+  - indicator 

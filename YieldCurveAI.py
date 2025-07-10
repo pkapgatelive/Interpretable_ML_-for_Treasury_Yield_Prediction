@@ -368,18 +368,40 @@ class YieldCurveAI:
         # Model comparison table
         st.subheader("📈 Model Performance Comparison")
         
+        # Help section for metrics
+        with st.expander("❓ Understanding Performance Metrics"):
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("""
+                **RMSE (Root Mean Square Error):**  
+                Measures prediction accuracy. Lower = better.  
+                
+                **MAE (Mean Absolute Error):**  
+                Average prediction error. Lower = better.
+                """)
+            with col2:
+                st.markdown("""
+                **R² (R-squared):**  
+                Variance explained (0-1). Higher = better.  
+                
+                **MAPE (Mean Absolute Percentage Error):**  
+                Error as percentage. Lower = better.  
+                
+                💡 Visit the Financial Glossary for detailed explanations.
+                """)
+        
         comparison_data = []
         for model_name, model_metrics in metrics.items():
             comparison_data.append({
                 'Model': model_name.replace('_', ' ').title(),
-                'RMSE': f"{model_metrics['rmse']:.4f}",
-                'MAE': f"{model_metrics['mae']:.4f}",
-                'R²': f"{model_metrics['r2']:.4f}",
-                'MAPE': f"{model_metrics['mape']:.2f}%"
+                'RMSE ❓': f"{model_metrics['rmse']:.4f}",
+                'MAE ❓': f"{model_metrics['mae']:.4f}",
+                'R² ❓': f"{model_metrics['r2']:.4f}",
+                'MAPE ❓': f"{model_metrics['mape']:.2f}%"
             })
         
         comparison_df = pd.DataFrame(comparison_data)
-        comparison_df = comparison_df.sort_values('RMSE')
+        comparison_df = comparison_df.sort_values('RMSE ❓')
         
         st.dataframe(comparison_df, use_container_width=True)
         
@@ -391,14 +413,14 @@ class YieldCurveAI:
         tabs = st.tabs([name.replace('_', ' ').title() for name in model_names])
         
         model_descriptions = {
-            'lasso': 'Linear regression with L1 regularization for feature selection',
-            'ridge': 'Linear regression with L2 regularization to prevent overfitting',
-            'elastic_net': 'Combines L1 and L2 regularization for balanced feature selection and regularization',
-            'random_forest': 'Ensemble method using multiple decision trees with bootstrap aggregating',
-            'gradient_boosting': 'Sequential ensemble method that builds models to correct predecessor errors',
-            'svr': 'Support Vector Regression using kernel methods for non-linear relationships',
-            'ensemble_simple': 'Simple averaging ensemble of multiple base models',
-            'ensemble_weighted': 'Weighted ensemble based on individual model performance'
+            'lasso': 'LASSO Regression: Linear regression with L1 regularization for automatic feature selection. 💡 See Financial Glossary for details.',
+            'ridge': 'Ridge Regression: Linear regression with L2 regularization to prevent overfitting. 💡 See Financial Glossary for details.',
+            'elastic_net': 'Elastic Net: Combines Ridge and LASSO regression for balanced feature selection and stability. 💡 See Financial Glossary for details.',
+            'random_forest': 'Random Forest: Ensemble method using multiple decision trees with bootstrap aggregating. 💡 See Financial Glossary for details.',
+            'gradient_boosting': 'Gradient Boosting: Sequential ensemble method that builds models to correct predecessor errors. 💡 See Financial Glossary for details.',
+            'svr': 'Support Vector Regression: Machine learning approach robust to outliers using kernel methods. 💡 See Financial Glossary for details.',
+            'ensemble_simple': 'Simple Ensemble: Averaging predictions from multiple base models for improved accuracy.',
+            'ensemble_weighted': 'Weighted Ensemble: Combines models based on individual performance weights for optimal predictions.'
         }
         
         for i, (tab, model_name) in enumerate(zip(tabs, model_names)):
@@ -470,6 +492,18 @@ class YieldCurveAI:
             return profiles_config
         except Exception as e:
             st.error(f"Error loading team profiles: {e}")
+            return None
+    
+    @st.cache_data
+    def load_glossary_data(_self):
+        """Load glossary terms from YAML configuration."""
+        try:
+            config_path = Path("config/glossary.yaml")
+            with open(config_path, 'r') as f:
+                glossary_config = yaml.safe_load(f)
+            return glossary_config
+        except Exception as e:
+            st.error(f"Error loading glossary data: {e}")
             return None
     
     def display_team_page(self):
@@ -596,6 +630,206 @@ class YieldCurveAI:
             - Engineering excellence
             """)
     
+    def display_glossary_page(self):
+        """Display the Financial Glossary page."""
+        glossary_config = self.load_glossary_data()
+        
+        if not glossary_config:
+            st.error("Could not load glossary data")
+            return
+        
+        # Page header
+        config = glossary_config.get('glossary_config', {})
+        st.markdown('<div class="main-header">📘 Financial Glossary</div>', 
+                   unsafe_allow_html=True)
+        st.markdown('<div class="sub-header">Essential financial and machine learning terminology for understanding U.S. Treasury yield curve forecasting</div>', 
+                   unsafe_allow_html=True)
+        
+        # Search and filter functionality
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            search_term = st.text_input(
+                "🔍 Search for a term",
+                placeholder="Type to search for specific financial terms...",
+                help="Search through term names, definitions, or context"
+            )
+        
+        with col2:
+            categories = glossary_config.get('categories', {})
+            category_options = ["All Categories"] + [cat_data['name'] for cat_data in categories.values()]
+            selected_category = st.selectbox(
+                "📂 Filter by Category",
+                options=category_options,
+                help="Filter terms by category"
+            )
+        
+        # Stats section
+        terms = glossary_config.get('terms', {})
+        total_terms = len(terms)
+        
+        st.markdown(f"""
+        <div class="info-box">
+            📊 <strong>Glossary Statistics:</strong> {total_terms} terms | Last updated: {config.get('last_updated', 'N/A')}<br>
+            💡 <strong>Tip:</strong> Use the search box to quickly find specific terms, or browse by category to explore related concepts.
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Filter terms based on search and category
+        filtered_terms = {}
+        for term_key, term_data in terms.items():
+            # Category filter
+            if selected_category != "All Categories":
+                term_category = term_data.get('category', '')
+                category_match = False
+                for cat_key, cat_data in categories.items():
+                    if cat_data['name'] == selected_category and term_category == cat_key:
+                        category_match = True
+                        break
+                if not category_match:
+                    continue
+            
+            # Search filter
+            if search_term:
+                search_lower = search_term.lower()
+                searchable_text = (
+                    term_data.get('term', '').lower() + ' ' +
+                    term_data.get('definition', '').lower() + ' ' +
+                    term_data.get('context', '').lower() + ' ' +
+                    term_data.get('example', '').lower()
+                )
+                if search_lower not in searchable_text:
+                    continue
+            
+            filtered_terms[term_key] = term_data
+        
+        # Display results count
+        if search_term or selected_category != "All Categories":
+            st.markdown(f"**Found {len(filtered_terms)} terms matching your criteria**")
+        
+        if not filtered_terms:
+            st.warning("No terms match your search criteria. Try different keywords or select 'All Categories'.")
+            return
+        
+        # Group terms by category for display
+        terms_by_category = {}
+        for term_key, term_data in filtered_terms.items():
+            category = term_data.get('category', 'other')
+            if category not in terms_by_category:
+                terms_by_category[category] = []
+            terms_by_category[category].append((term_key, term_data))
+        
+        # Display terms organized by category
+        for category_key, category_terms in terms_by_category.items():
+            # Get category info
+            category_info = categories.get(category_key, {
+                'name': category_key.replace('_', ' ').title(),
+                'icon': '📋'
+            })
+            
+            # Category header
+            st.markdown(f"""
+            <div style="background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%); 
+                        padding: 1rem; border-radius: 0.5rem; margin: 1.5rem 0 1rem 0;
+                        border-left: 4px solid #1f4e79;">
+                <h3 style="color: #1f4e79; margin: 0;">
+                    {category_info['icon']} {category_info['name']}
+                </h3>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Sort terms alphabetically within category
+            category_terms.sort(key=lambda x: x[1].get('term', ''))
+            
+            # Display terms in expandable format
+            for term_key, term_data in category_terms:
+                term_name = term_data.get('term', term_key)
+                definition = term_data.get('definition', 'No definition available')
+                context = term_data.get('context', '')
+                example = term_data.get('example', '')
+                
+                with st.expander(f"🔹 **{term_name}**", expanded=False):
+                    # Definition
+                    st.markdown(f"**📖 Definition:**")
+                    st.markdown(f"{definition}")
+                    
+                    # Context in YieldCurveAI
+                    if context:
+                        st.markdown(f"**💡 How it's used in YieldCurveAI:**")
+                        st.markdown(f"{context}")
+                    
+                    # Example
+                    if example:
+                        st.markdown(f"**📊 Example:**")
+                        st.markdown(f"_{example}_")
+                    
+                    # Visual aid (if available)
+                    visual = term_data.get('visual')
+                    if visual:
+                        visual_path = Path(f"static/images/glossary/{visual}")
+                        if visual_path.exists():
+                            st.image(str(visual_path), caption=f"Visual aid for {term_name}", width=400)
+                        else:
+                            st.info(f"📊 Visual aid available: {visual}")
+        
+        # Quick reference section
+        st.markdown("---")
+        st.subheader("📚 Quick Reference Guide")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("""
+            **🎯 Key Concepts for Beginners:**
+            - Start with "Yield Curve" and "Treasury Securities"
+            - Learn about "Tenor" and "Maturity Date" 
+            - Understand "Fed Funds Rate" and "CPI YoY"
+            - Explore "Forecast Horizon" concepts
+            """)
+        
+        with col2:
+            st.markdown("""
+            **🤖 For Technical Users:**
+            - Review machine learning model types
+            - Understand evaluation metrics (RMSE, MAE, R²)
+            - Learn about forecasting methodologies
+            - Explore feature engineering concepts
+            """)
+        
+        # Export functionality
+        st.markdown("---")
+        st.subheader("💾 Export Glossary")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Create CSV export
+            export_data = []
+            for term_key, term_data in filtered_terms.items():
+                export_data.append({
+                    'Term': term_data.get('term', ''),
+                    'Category': categories.get(term_data.get('category', ''), {}).get('name', ''),
+                    'Definition': term_data.get('definition', ''),
+                    'Context': term_data.get('context', ''),
+                    'Example': term_data.get('example', '')
+                })
+            
+            if export_data:
+                export_df = pd.DataFrame(export_data)
+                csv_data = export_df.to_csv(index=False)
+                
+                st.download_button(
+                    "📄 Download Glossary as CSV",
+                    data=csv_data,
+                    file_name=f"YieldCurveAI_Glossary_{datetime.now().strftime('%Y%m%d')}.csv",
+                    mime="text/csv",
+                    help="Download filtered glossary terms as CSV file"
+                )
+        
+        with col2:
+            # PDF export note
+            st.info("📄 PDF export available in enterprise version")
+    
     def display_forecast_page(self):
         """Display the main Yield Forecast Tool page."""
         st.markdown('<div class="main-header">📈 Yield Forecast Tool</div>', 
@@ -618,38 +852,38 @@ class YieldCurveAI:
             st.subheader("💰 Economic Indicators")
             
             fed_funds_rate = st.number_input(
-                "Fed Funds Rate (%)",
+                "Fed Funds Rate (%) ❓",
                 min_value=0.0,
                 max_value=20.0,
                 value=5.25,
                 step=0.25,
-                help="Federal Funds Target Rate"
+                help="Federal Funds Target Rate: The interest rate at which banks lend money to each other overnight, set by the Federal Reserve. 💡 See Financial Glossary for more details."
             )
             
             cpi_yoy = st.number_input(
-                "CPI YoY (%)",
+                "CPI Year-over-Year (%) ❓",
                 min_value=-5.0,
                 max_value=15.0,
                 value=3.2,
                 step=0.1,
-                help="Consumer Price Index Year-over-Year change"
+                help="Consumer Price Index Year-over-Year change: Measures inflation by comparing current prices to the same month last year. 💡 See Financial Glossary for more details."
             )
             
             # Forecast horizon
             forecast_horizon = st.selectbox(
-                "Forecast Horizon",
+                "Forecast Horizon ❓",
                 options=["1-day", "1-week", "1-month"],
                 index=0,
-                help="Time horizon for the forecast"
+                help="Forecast Horizon: The length of time into the future for which predictions are made. Choose how far ahead you want to predict yield curve movements. 💡 See Financial Glossary for more details."
             )
             
             # Model selection
             st.subheader("🤖 Model Selection")
             
             selection_mode = st.radio(
-                "Model Selection Mode",
+                "Model Selection Mode ❓",
                 options=["Automatic (Best Model Based on RMSE)", "Manual Selection"],
-                help="Choose automatic best model or select manually"
+                help="Model Selection: Choose whether to let the system automatically pick the best-performing model (based on RMSE) or manually select a specific machine learning model. 💡 See Financial Glossary for RMSE and model details."
             )
             
             selected_model = None
@@ -664,9 +898,9 @@ class YieldCurveAI:
                 }
                 
                 selected_model_name = st.selectbox(
-                    "Select Model",
+                    "Select Model ❓",
                     options=list(model_options.keys()),
-                    help="Choose a specific model for forecasting"
+                    help="Choose a specific machine learning model: Ridge (linear with regularization), LASSO (automatic feature selection), ElasticNet (hybrid approach), Random Forest (tree-based ensemble), XGBoost/LightGBM (gradient boosting). 💡 See Financial Glossary for detailed explanations."
                 )
                 selected_model = model_options[selected_model_name]
             
@@ -750,11 +984,14 @@ class YieldCurveAI:
                 if selected_metrics:
                     col1, col2, col3 = st.columns(3)
                     with col1:
-                        st.metric("RMSE", f"{selected_metrics.get('rmse', 0):.4f}")
+                        st.metric("RMSE ❓", f"{selected_metrics.get('rmse', 0):.4f}", 
+                                help="Root Mean Square Error: Measures prediction accuracy. Lower values indicate better performance.")
                     with col2:
-                        st.metric("MAE", f"{selected_metrics.get('mae', 0):.4f}")
+                        st.metric("MAE ❓", f"{selected_metrics.get('mae', 0):.4f}",
+                                help="Mean Absolute Error: Average prediction error in percentage points. Lower is better.")
                     with col3:
-                        st.metric("R²", f"{selected_metrics.get('r2', 0):.4f}")
+                        st.metric("R² ❓", f"{selected_metrics.get('r2', 0):.4f}",
+                                help="R-squared: Proportion of variance explained by the model (0-1 scale). Higher is better.")
                 
                 # Results table
                 st.subheader("📋 Forecast Results")
@@ -796,7 +1033,7 @@ class YieldCurveAI:
         # Navigation
         page = st.radio(
             "Navigate",
-            options=["📈 Forecast", "📊 Model Info", "👥 Team & Oversight"],
+            options=["📈 Forecast", "📊 Model Info", "👥 Team & Oversight", "📘 Financial Glossary"],
             horizontal=True,
             label_visibility="collapsed"
         )
@@ -807,8 +1044,10 @@ class YieldCurveAI:
             self.display_forecast_page()
         elif page == "📊 Model Info":
             self.display_model_info_page()
-        else:
+        elif page == "👥 Team & Oversight":
             self.display_team_page()
+        else:
+            self.display_glossary_page()
         
         # Add app-wide footer
         self.display_footer()
@@ -825,7 +1064,8 @@ class YieldCurveAI:
         st.markdown("---")
         st.markdown(f"""
         <div style="text-align: center; color: #888; font-size: 0.9rem; margin-top: 2rem; padding: 1rem;">
-            {footer_text}
+            {footer_text}<br>
+            📘 <strong>Learn more:</strong> Visit the Financial Glossary page to explore the terminology used in YieldCurveAI.
         </div>
         """, unsafe_allow_html=True)
 
