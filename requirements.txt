@@ -1,27 +1,8 @@
 # Streamlit Deployment Requirements - YieldCurveAI
-# =================================================
-# Minimal, clean requirements for Streamlit Community Cloud deployment
-
-# Core Streamlit
 streamlit>=1.28.0
-
-# Data handling
 pandas>=1.3.0
 numpy>=1.21.0
-
-# Visualization (CRITICAL - this was missing!)
 plotly>=5.6.0
-
-# Machine Learning
 scikit-learn>=1.0.0
-
-# Configuration
 PyYAML>=6.0
-
-# Additional utilities
-requests>=2.27.0
-
-# Python standard library (explicit for deployment)
-datetime
-pathlib
-json 
+requests>=2.27.0 
