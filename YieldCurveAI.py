@@ -820,7 +820,7 @@ class YieldCurveAI:
         if profiles_config and 'footer_config' in profiles_config:
             footer_text = profiles_config['footer_config']['text']
         else:
-            footer_text = "Built by Mr. Pappu Kapgate | AI Engineered by Dr. Kapila Mallah | Overseen by Dr. Eric Katovai (PVC Academic)"
+            footer_text = "Finance & Economics by Dr. Kapila Mallah | Overseen by Dr. Eric Katovai (PVC Academic) | Built by Mr. Pappu Kapgate, AI Engineer"
         
         st.markdown("---")
         st.markdown(f"""
