@@ -1,0 +1,67 @@
+# Team Profile Configuration for YieldCurveAI
+# =============================================
+# This file contains the structured biographical and professional information
+# for all contributors to the YieldCurveAI project.
+
+team_profiles:
+  dr_kapila_mallah:
+    name: "Dr. Kapila Mallah"
+    title: "Associate Professor, Economics"
+    affiliation: "Hansraj College, University of Delhi; Visiting Professor of Economics, SINU"
+    specialization: "Microeconomics, Macroeconomics, Education Inequality"
+    education:
+      - "Ph.D. from Jawaharlal Nehru University (JNU)"
+      - "M.Phil from Jawaharlal Nehru University (JNU)"
+      - "M.Sc. in Economics & Econometrics from University of Nottingham"
+    career: "14+ years academic experience, curriculum leader, academic council member"
+    contributions: "AI design for economic forecasting, evaluation logic for yield prediction models"
+    contact: "kapilamallah@hrc.du.ac.in"
+    links:
+      hansraj_profile: "https://www.hansrajcollege.ac.in/academics/departments/arts-and-commerce/economics/faculty-detail/64/"
+    tagline: "AI Engineered by Dr. Kapila Mallah"
+    image: "static/images/team/dr_kapila_mallah.jpg"
+    order: 1
+
+  mr_pappu_kapgate:
+    name: "Mr. Pappu Dindayal Kapgate"
+    title: "Director, CEIT – Solomon Islands"
+    affiliation: "Solomon Islands National University; Project Engineer, CDAC India"
+    expertise: "Generative AI, ML Deployment, Cybersecurity, ICT Infrastructure"
+    education:
+      - "MSc Data Science from Liverpool John Moores University (LJMU), UK"
+      - "PG Diploma from Centre for Development of Advanced Computing (CDAC)"
+      - "B.E. from Yeshwantrao Chavan College of Engineering (YCCE), Nagpur"
+    technical_skills: "Python, SQL, Tableau, PySpark, Airflow, ML Modeling"
+    contributions: "Project lead, full-stack architecture, integration of ML pipeline with frontend"
+    links:
+      linkedin: "https://www.linkedin.com/in/pkapgate"
+    tagline: "Built by Mr. Pappu Kapgate"
+    image: "static/images/team/mr_pappu_kapgate.jpg"
+    order: 2
+
+  dr_eric_katovai:
+    name: "Dr. Eric Katovai"
+    title: "Pro Vice-Chancellor (Academic)"
+    affiliation: "Solomon Islands National University (SINU); Associate Professor (Science & Technology)"
+    expertise: "Tropical Ecology, Academic Governance, Postgraduate Education"
+    education:
+      - "Ph.D. from James Cook University"
+      - "M.Sc. from University of Queensland"
+      - "B.Ed./B.Sc. from Papua New Guinea University (PAU PNG)"
+    leadership: "20 years in academia; led FST governance, USP Council member"
+    contributions: "Institutional oversight and academic validation for the project"
+    links:
+      sinu_profile: "https://www.sinu.edu.sb/executive-governance/vice-chancellor/pro-vice-chancellor-academic/"
+    tagline: "Oversight by Dr. Eric Katovai (PVC Academic)"
+    image: "static/images/team/dr_eric_katovai.jpg"
+    order: 3
+
+# Page configuration
+page_config:
+  title: "👥 Team & Oversight"
+  description: "YieldCurveAI is the product of collaborative efforts between academic leadership, AI research, and engineering excellence. Meet the contributors behind this innovative tool."
+  
+# Footer configuration
+footer_config:
+  text: "Built by Mr. Pappu Kapgate | AI Engineered by Dr. Kapila Mallah | Overseen by Dr. Eric Katovai (PVC Academic)"
+  style: "muted" 
